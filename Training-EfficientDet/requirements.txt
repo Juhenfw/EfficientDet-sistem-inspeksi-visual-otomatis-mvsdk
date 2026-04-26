@@ -1,0 +1,21 @@
+# Core Deep Learning Framework
+torch>=1.6.0
+torchvision>=0.7.0
+
+# Data Manipulation & Numerical Computing
+numpy
+pandas
+
+# Image Processing & Computer Vision
+opencv-python
+pycocotools
+
+# Configuration & Logging
+pyyaml
+tensorboard
+tensorboardX
+tqdm
+
+# Visualization
+matplotlib
+seaborn
