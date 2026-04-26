@@ -32,7 +32,7 @@ Perangkat lunak operasional untuk **Stasiun Unit Utama**.
 
 ## Arsitektur Pendukung
 
-* **[GUI_v5.py](./GUI_v5.py)**: Pustaka inti antarmuka pengguna berbasis *CustomTkinter* yang menyediakan layout responsif dan visualisasi status produksi (PASS/FAIL).
+* **[GUI_v5.py](./GUI_v5.py)**: Pustaka inti antarmuka pengguna berbasis *CustomTkinter* yang menyediakan layout responsif dan visualisasi status produksi (OK/Not Good (NG)).
 * **[mvsdk.py](./mvsdk.py)**: Driver Python SDK untuk integrasi langsung dengan kamera industri MindVision.
 
 ---
