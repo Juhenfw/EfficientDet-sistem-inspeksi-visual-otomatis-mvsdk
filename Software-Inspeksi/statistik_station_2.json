@@ -1,0 +1,13 @@
+{
+    "tanggal": "2026-04-24",
+    "Pianika Model P32E (Biru)": {
+        "total": 1,
+        "pass": 0,
+        "fail": 1
+    },
+    "Pianika Model P32EP (Pink)": {
+        "total": 1,
+        "pass": 1,
+        "fail": 0
+    }
+}
