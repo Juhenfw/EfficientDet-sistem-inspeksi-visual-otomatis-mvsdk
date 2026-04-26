@@ -1,0 +1,84 @@
+PER-CLASS PERFORMANCE METRICS
+======================================================================
+
+
+📦 Class: buku_manual
+   TP (True Positive)      : 124
+   FP (False Positive)     :   0
+   FN (False Negative)     :   1
+   Precision               : 1.0000
+   Recall                  : 0.9920
+   F1-Score                : 0.9960
+----------------------------------------------------------------------
+
+📦 Class: case_biru
+   TP (True Positive)      : 219
+   FP (False Positive)     :   0
+   FN (False Negative)     :   0
+   Precision               : 1.0000
+   Recall                  : 1.0000
+   F1-Score                : 1.0000
+----------------------------------------------------------------------
+
+📦 Class: case_pink
+   TP (True Positive)      : 229
+   FP (False Positive)     :   0
+   FN (False Negative)     :   0
+   Precision               : 1.0000
+   Recall                  : 1.0000
+   F1-Score                : 1.0000
+----------------------------------------------------------------------
+
+📦 Class: hose
+   TP (True Positive)      : 288
+   FP (False Positive)     :   0
+   FN (False Negative)     :   2
+   Precision               : 1.0000
+   Recall                  : 0.9931
+   F1-Score                : 0.9965
+----------------------------------------------------------------------
+
+📦 Class: label
+   TP (True Positive)      : 268
+   FP (False Positive)     :   0
+   FN (False Negative)     :   1
+   Precision               : 1.0000
+   Recall                  : 0.9963
+   F1-Score                : 0.9981
+----------------------------------------------------------------------
+
+📦 Class: leaflet
+   TP (True Positive)      : 121
+   FP (False Positive)     :   0
+   FN (False Negative)     :   7
+   Precision               : 1.0000
+   Recall                  : 0.9453
+   F1-Score                : 0.9719
+----------------------------------------------------------------------
+
+📦 Class: mouthpiece
+   TP (True Positive)      : 272
+   FP (False Positive)     :   0
+   FN (False Negative)     :   0
+   Precision               : 1.0000
+   Recall                  : 1.0000
+   F1-Score                : 1.0000
+----------------------------------------------------------------------
+
+📦 Class: pianika_biru
+   TP (True Positive)      :  70
+   FP (False Positive)     :   0
+   FN (False Negative)     :  15
+   Precision               : 1.0000
+   Recall                  : 0.8235
+   F1-Score                : 0.9032
+----------------------------------------------------------------------
+
+📦 Class: pianika_pink
+   TP (True Positive)      :  78
+   FP (False Positive)     :   0
+   FN (False Negative)     :  11
+   Precision               : 1.0000
+   Recall                  : 0.8764
+   F1-Score                : 0.9341
+----------------------------------------------------------------------

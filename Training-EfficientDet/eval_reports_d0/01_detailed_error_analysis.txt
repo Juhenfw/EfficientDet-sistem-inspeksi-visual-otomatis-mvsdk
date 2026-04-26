@@ -1,0 +1,50 @@
+================================================================================
+                            DETAILED ERROR ANALYSIS
+                            ================================================================================
+
+FALSE POSITIVES ANALYSIS
+--------------------------------------------------------------------------------
+No false positives detected!
+
+
+FALSE NEGATIVES ANALYSIS (MISSED OBJECTS)
+--------------------------------------------------------------------------------
+  buku_manual                   :   1 missed objects
+  hose                          :   2 missed objects
+  label                         :   1 missed objects
+  leaflet                       :   7 missed objects
+  pianika_biru                  :  15 missed objects
+  pianika_pink                  :  11 missed objects
+
+
+MISCLASSIFICATION ANALYSIS
+--------------------------------------------------------------------------------
+Total misclassified: 19
+
+  buku_manual:
+    Predicted as leaflet: 3
+  pianika_biru:
+    Predicted as pianika_pink: 10
+  pianika_pink:
+    Predicted as pianika_biru: 6
+
+
+LOW CONFIDENCE DETECTIONS (<0.7)
+--------------------------------------------------------------------------------
+Total: 34
+  buku_manual                   :   1 | Avg: 0.5073
+  case_biru                     :   3 | Avg: 0.5077
+  case_pink                     :  12 | Avg: 0.5317
+  hose                          :  11 | Avg: 0.5413
+  pianika_biru                  :   2 | Avg: 0.5348
+  pianika_pink                  :   5 | Avg: 0.5048
+
+
+PARTIAL DETECTIONS (IoU 0.1-0.5)
+--------------------------------------------------------------------------------
+Total: 12
+
+  case_pink                     :   1 | Avg IoU: 0.2316
+  hose                          :   7 | Avg IoU: 0.3428
+  leaflet                       :   1 | Avg IoU: 0.4909
+  pianika_biru                  :   3 | Avg IoU: 0.4816
