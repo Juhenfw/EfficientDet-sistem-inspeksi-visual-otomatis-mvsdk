@@ -53,10 +53,10 @@ Proyek ini terbagi menjadi dua modul fungsional utama:
 
 Jika Anda menggunakan kode atau hasil penelitian dari repositori ini, harap berikan atribusi sesuai format berikut:
 
-**Bahasa Indonesia:**
+**Bahasa Indonesia:**\
 Wildan, J. F. (2026). Implementasi EfficientDet untuk Deteksi Komponen dan Klasifikasi Kelengkapan Alat Musik Pianika pada Sistem Inspeksi di PT. XYZ. Skripsi. Surabaya: Universitas Airlangga.
 
-**English:**
+**English:**\
 Wildan, J. F. (2026). Implementation of EfficientDet for Component Detection and Completeness Classification of Melodica Musical Instruments in the Inspection System at PT. XYZ. Undergraduate Thesis. Surabaya: Universitas Airlangga.
 
 ---
