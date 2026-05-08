@@ -26,8 +26,8 @@ from utils.utils import preprocess, invert_affine, postprocess
 
 # --- KONFIGURASI MANUAL ---  
 PROJECT_NAME = 'pianika_1' 
-COMPOUND_COEF = 0 # Ganti ke 0 jika ingin mengevaluasi D0
-WEIGHTS_PATH = r'D:\VSCODE\EfficientDet-Pytorch\logs\pianika_d0_batch9\best_loss_d0.pth' # Sesuaikan path
+COMPOUND_COEF = 1 # Ganti ke 0 jika ingin mengevaluasi D0
+WEIGHTS_PATH = r'D:\VSCODE\EfficientDet-Pytorch\logs\pianika_d1_batch9\best_loss_d1.pth' # Sesuaikan path
 THRESHOLD = 0.5
 IOU_THRESHOLD = 0.5
 USE_CUDA = True  
@@ -209,91 +209,101 @@ class ModelEvaluator:
         
         out = invert_affine(framed_metas, out)  
         
-        predictions = []  
-        if len(out[0]['rois']) > 0:  
-            for i in range(len(out[0]['rois'])):  
-                x1, y1, x2, y2 = out[0]['rois'][i].astype(int)  
-                score = float(out[0]['scores'][i])  
-                class_id = int(out[0]['class_ids'][i])  
-                class_name = self.obj_list[class_id]  
+        predictions = []
+        if len(out[0]['rois']) > 0:
+            for i in range(len(out[0]['rois'])):
+                x1, y1, x2, y2 = out[0]['rois'][i].astype(int)
+                score = float(out[0]['scores'][i])
+                class_id = int(out[0]['class_ids'][i])
+                class_name = self.obj_list[class_id]
+
+                predictions.append({
+                    'class': class_name,
+                    'class_id': class_id,
+                    'confidence': score,
+                    'bbox': [x1, y1, x2, y2]
+                })
+
+        # --- [REVISI DIMULAI DI SINI] ---
+        # 1. WAJIB: Urutkan dari confidence tertinggi ke terendah
+        predictions = sorted(predictions, key=lambda x: x['confidence'], reverse=True)
+
+        matched_gt = set()
+        tp = 0
+        fp = 0
+
+        image_errors = {
+            'false_positives': [],
+            'false_negatives': [],
+            'low_confidence': [],
+            'misclassified': [],
+            'partial_detections': []
+        }
+
+        # 2. Greedy Matching
+        for pred in predictions:
+            best_iou = 0
+            best_gt_idx = -1
+
+            for gt_idx, gt in enumerate(gt_annotations):
+                if gt_idx in matched_gt:
+                    continue  # Abaikan GT yang sudah terpakai
                 
-                predictions.append({  
-                    'class': class_name,  
-                    'class_id': class_id,  
-                    'confidence': score,  
-                    'bbox': [x1, y1, x2, y2]  
-                })  
-        
-        matched_gt = set()  
-        tp = 0  
-        fp = 0  
-        
-        image_errors = {  
-            'false_positives': [],  
-            'false_negatives': [],  
-            'low_confidence': [],  
-            'misclassified': [],  
-            'partial_detections': []  
-        }  
-        
-        for pred_idx, pred in enumerate(predictions):  
-            best_iou = 0  
-            best_gt_idx = -1  
-            
-            for gt_idx, gt in enumerate(gt_annotations):  
-                if gt_idx in matched_gt:  
-                    continue  
+                iou = self._calculate_iou(pred['bbox'], gt['bbox'])
+                if iou > best_iou:
+                    best_iou = iou
+                    best_gt_idx = gt_idx
+
+            if best_iou >= 0.5:
+                # Tandai GT sebagai terpakai agar tidak diklaim ganda
+                matched_gt.add(best_gt_idx)
                 
-                iou = self._calculate_iou(pred['bbox'], gt['bbox'])  
-                if iou > best_iou:  
-                    best_iou = iou  
-                    best_gt_idx = gt_idx  
-            
-            if best_iou >= 0.5:  
-                if pred['class'] == gt_annotations[best_gt_idx]['class']:  
-                    tp += 1  
-                    matched_gt.add(best_gt_idx)  
-                else:  
-                    fp += 1  
-                    image_errors['misclassified'].append({  
-                        'predicted': pred['class'],  
-                        'actual': gt_annotations[best_gt_idx]['class'],  
-                        'confidence': pred['confidence'],  
-                        'iou': best_iou  
-                    })  
-            elif best_iou > 0.1 and best_iou < 0.5:  
-                fp += 1  
-                image_errors['partial_detections'].append({  
-                    'predicted': pred['class'],  
-                    'actual': gt_annotations[best_gt_idx]['class'] if best_gt_idx >= 0 else 'unknown',  
-                    'confidence': pred['confidence'],  
-                    'iou': best_iou  
-                })  
-            elif pred['confidence'] < 0.7:  
-                fp += 1  
-                image_errors['low_confidence'].append({  
-                    'class': pred['class'],  
-                    'confidence': pred['confidence'],  
-                    'has_match': best_gt_idx >= 0  
-                })  
-            else:  
-                fp += 1  
-                image_errors['false_positives'].append({  
-                    'class': pred['class'],  
-                    'confidence': pred['confidence']  
-                })  
-        
-        fn = len(gt_annotations) - len(matched_gt)  
-        for gt_idx, gt in enumerate(gt_annotations):  
-            if gt_idx not in matched_gt:  
-                image_errors['false_negatives'].append({  
-                    'class': gt['class'],  
-                    'bbox': gt['bbox']  
-                })  
-        
-        precision = tp / (tp + fp) if (tp + fp) > 0 else 0  
-        recall = tp / (tp + fn) if (tp + fn) > 0 else 0  
-        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0  
+                if pred['class'] == gt_annotations[best_gt_idx]['class']:
+                    tp += 1
+                else:
+                    fp += 1  # Misclassification
+                    image_errors['misclassified'].append({
+                        'predicted': pred['class'],
+                        'actual': gt_annotations[best_gt_idx]['class'],
+                        'confidence': pred['confidence'],
+                        'iou': best_iou
+                    })
+            elif best_iou > 0.1 and best_iou < 0.5:
+                fp += 1  # Partial Detection
+                image_errors['partial_detections'].append({
+                    'predicted': pred['class'],
+                    'actual': gt_annotations[best_gt_idx]['class'] if best_gt_idx >= 0 else 'unknown',
+                    'confidence': pred['confidence'],
+                    'iou': best_iou
+                })
+            elif pred['confidence'] < 0.7:
+                fp += 1  # Low Confidence False Positive
+                image_errors['low_confidence'].append({
+                    'class': pred['class'],
+                    'confidence': pred['confidence'],
+                    'has_match': best_gt_idx >= 0
+                })
+            else:
+                fp += 1  # Pure False Positive (Background)
+                image_errors['false_positives'].append({
+                    'class': pred['class'],
+                    'confidence': pred['confidence']
+                })
+
+        # 3. Hitung False Negatives (GT yang sama sekali tidak ada yang menebak)
+        fn = len(gt_annotations) - len(matched_gt)
+        for gt_idx, gt in enumerate(gt_annotations):
+            if gt_idx not in matched_gt:
+                image_errors['false_negatives'].append({
+                    'class': gt['class'],
+                    'bbox': gt['bbox']
+                })
+        # --- [REVISI SELESAI SAMPAI DI SINI] ---
+
+        # Hitung metrics
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
         
         return {  
             'image_path': image_path,  
@@ -306,7 +316,7 @@ class ModelEvaluator:
             'fn': fn,  
             'precision': precision,  
             'recall': recall,  
-            'f1': f1,  
+            'f1': f1_score,  
             'predictions': predictions,  
             'ground_truths': gt_annotations,  
             'errors': image_errors,  
@@ -945,45 +955,57 @@ class ModelEvaluator:
     
     def _save_confusion_matrix_visualization(self, results, output_dir):
         import matplotlib.pyplot as plt
+        import seaborn as sns
+        from sklearn.metrics import confusion_matrix
+        import os
+        
         all_predictions = []
         all_ground_truths = []
         
         for result in results:
-            for pred in result['predictions']:
-                is_correct = False
+            matched_gt_indices = set()
+            
+            # Urutkan berdasarkan confidence
+            sorted_preds = sorted(result['predictions'], key=lambda x: x['confidence'], reverse=True)
+            
+            for pred in sorted_preds:
                 best_iou = 0
-                gt_class = None
+                best_gt_idx = -1
                 
-                for gt in result['ground_truths']:
+                for gt_idx, gt in enumerate(result['ground_truths']):
+                    if gt_idx in matched_gt_indices:
+                        continue
+                        
                     iou = self._calculate_iou(pred['bbox'], gt['bbox'])
                     if iou > best_iou:
                         best_iou = iou
-                        gt_class = gt['class']
-                        if iou >= 0.5 and pred['class'] == gt['class']:
-                            is_correct = True
+                        best_gt_idx = gt_idx
                 
                 if best_iou >= 0.5:
+                    gt_class = result['ground_truths'][best_gt_idx]['class']
                     all_predictions.append(pred['class'])
                     all_ground_truths.append(gt_class)
+                    matched_gt_indices.add(best_gt_idx)
+                else:
+                    # False Positive (Prediksi berlebih / background)
+                    all_predictions.append(pred['class'])
+                    all_ground_truths.append('background')
             
-            for gt in result['ground_truths']:
-                found = False
-                for pred in result['predictions']:
-                    iou = self._calculate_iou(pred['bbox'], gt['bbox'])
-                    if iou >= 0.5 and pred['class'] == gt['class']:
-                        found = True
-                        break
-                
-                if not found:
+            # False Negative (Ground Truth yang terlewat)
+            for gt_idx, gt in enumerate(result['ground_truths']):
+                if gt_idx not in matched_gt_indices:
                     all_ground_truths.append(gt['class'])
-                    all_predictions.append('not_detected')
+                    all_predictions.append('background')
         
         if not all_predictions or not all_ground_truths:
+            print("No valid predictions/ground truths found for confusion matrix.")
             return
-        
-        from sklearn.metrics import confusion_matrix
-        
-        classes = sorted(set(all_predictions + all_ground_truths))
+            
+        unique_classes = set(all_predictions + all_ground_truths)
+        classes = sorted([c for c in unique_classes if c != 'background'])
+        if 'background' in unique_classes:
+            classes.append('background')
+            
         cm = confusion_matrix(all_ground_truths, all_predictions, labels=classes)
         
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -993,13 +1015,15 @@ class ModelEvaluator:
         
         ax.set_xlabel('Predicted Label', fontweight='bold')
         ax.set_ylabel('True Label', fontweight='bold')
-        ax.set_title('Confusion Matrix', fontweight='bold', fontsize=14)
+        ax.set_title('Confusion Matrix', fontweight='bold', pad=20)
+        plt.xticks(rotation=45, ha='right')
+        plt.yticks(rotation=0)
         
         plt.tight_layout()
         cm_path = os.path.join(output_dir, '04_confusion_matrix.png')
         plt.savefig(cm_path, dpi=300, bbox_inches='tight')
         plt.close()
-        print(f"✅ Confusion matrix saved: {cm_path}")
+        print(f"Confusion matrix saved to: {cm_path}")
 
 
 def main():
