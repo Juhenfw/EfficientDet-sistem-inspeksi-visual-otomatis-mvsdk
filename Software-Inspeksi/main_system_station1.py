@@ -148,8 +148,8 @@ class InspectionEngine:
         self.threshold = 0.5
         self.iou_threshold = 0.5
         self.max_input_size = 640 
-        self.model_path = r'EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk\Software-Inspeksi\models\best_loss_d1.pth'
-        self.project_yml = r'EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk\Software-Inspeksi\projects\pianika.yml'
+        self.model_path = r'D:\VSCODE\Skripsi_EfficientDet\Software\models\best_loss_d1_batch9.pth'
+        self.project_yml = r'D:\VSCODE\Skripsi_EfficientDet\Software\projects\pianika.yml'
         
         # Target Stage 1
         self.target_stage_1 = ['label', 'hose', 'mouthpiece', 'leaflet', 'buku_manual']
@@ -158,7 +158,7 @@ class InspectionEngine:
         self.target_stage_2_p32e = ['pianika_biru', 'case_biru']
         self.target_stage_2_p32ep = ['pianika_pink', 'case_pink']
         
-        self.config_dir = r'EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk\Software-Inspeksi\configs'
+        self.config_dir = r'D:\VSCODE\Skripsi_EfficientDet\Software\configs'
         self.all_zones = {
             "station_1_p32e": self.load_json_zone('zones_station_1_P32E.json'),
             "station_2_p32e": self.load_json_zone('zones_station_2_P32E.json'),
@@ -234,6 +234,9 @@ class InspectionEngine:
 
         active_zones = self.get_active_zones(current_model)
 
+        temp_path = "temp_inference.bmp"
+        cv2.imwrite(temp_path, result_image)
+
         # 1. Gambar zona kalibrasi
         for obj_name, rel_coords in active_zones.items():
             rx1, ry1 = int(rel_coords[0] * img_w), int(rel_coords[1] * img_h)
@@ -243,9 +246,6 @@ class InspectionEngine:
             # Gunakan zone_font_scale
             cv2.putText(result_image, f"Zone {obj_name}", (rx1, ry1-5), 
                         cv2.FONT_HERSHEY_SIMPLEX, zone_font_scale, (0, 255, 0), 1)
-
-        temp_path = "temp_inference.bmp"
-        cv2.imwrite(temp_path, result_image)
 
         try:
             ori_imgs, framed_imgs, framed_metas = preprocess(temp_path, max_size=self.max_input_size)
