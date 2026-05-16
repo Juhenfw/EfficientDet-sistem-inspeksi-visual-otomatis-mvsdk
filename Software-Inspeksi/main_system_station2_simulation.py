@@ -21,7 +21,7 @@ from utils.utils import preprocess, invert_affine, postprocess
 # --- IMPORT MINDVISION KAMERA ---
 import mvsdk 
 
-# Import UI terbaru (Pastikan nama file dan foldernya benar)
+# Import UI terbaru
 from GUI_v5 import InspectionUI, STATUS_COLORS, get_scaled_size
 
 # =====================================================================
@@ -32,10 +32,10 @@ STATION_MODE = 2  # 1 untuk Aksesoris, 2 untuk Case & Pianika
 KAMERA_INDEX = 1  # 0 untuk kamera pertama yg tercolok, 1 untuk yg kedua
 SHARED_FILE = "antrean_produksi.json" 
 CONFIG_FILE = "configs/camera2_config.json"
-OPERATOR_FILE = "configs/operator.json" 
+OPERATOR_FILE = "configs/operator.json" # File Data untuk NIK & Nama Operator
 
 # =====================================================================
-# KELAS MANAJEMEN ANTREAN CERDAS (SMART QUEUE IPC)
+# SMART QUEUE IPC (Inter-Process Communication)
 # =====================================================================
 class SyncManager:
     def __init__(self, file_path=SHARED_FILE):
@@ -79,7 +79,7 @@ class SyncManager:
         self.write_data(data)
 
 # =====================================================================
-# KELAS DATA MANAJER (STATISTIK HARIAN & LOGGING CSV)
+# STATISTIK HARIAN & LOGGING CSV
 # =====================================================================
 class DataManager:
     def __init__(self, station_id):
@@ -142,7 +142,7 @@ class DataManager:
             print(f"[LOG ERROR] Gagal menulis ke CSV: {e}")
 
 # =====================================================================
-# KELAS LOGIKA AI & INSPEKSI
+# LOGIKA AI & INSPEKSI
 # =====================================================================
 class InspectionEngine:
     def __init__(self):
@@ -229,11 +229,11 @@ class InspectionEngine:
 
         active_zones = self.get_active_zones(current_model)
 
-        # 1. Simpan gambar asli (image_np) yang masih BERSIH untuk AI
+        # Simpan gambar asli (image_np) yang masih BERSIH untuk AI
         temp_path = "temp_inference_clean.bmp"
         cv2.imwrite(temp_path, image_np)
 
-        # 2. Gambar zona pada result_image HANYA untuk tampilan UI
+        # Gambar zona pada result_image HANYA untuk tampilan UI
         for obj_name, rel_coords in active_zones.items():
             rx1, ry1 = int(rel_coords[0] * img_w), int(rel_coords[1] * img_h)
             rx2, ry2 = int(rel_coords[2] * img_w), int(rel_coords[3] * img_h)
@@ -376,7 +376,6 @@ class MainController:
         self.update_ui_stats()
         self.update_guide_image(self.ui.model_dropdown.get()) 
         
-        # --- LOGIKA INISIALISASI BERDASARKAN MODE ---
         if not MODE_OFFLINE:
             self.init_camera()
         else:
@@ -602,7 +601,7 @@ class MainController:
         self.root.after(500, self.pantau_status_station1)
 
     # =====================================================================
-    # LOGIKA BARU: MULAI INSPEKSI (Dukungan Offline/Pilih File Lokal)
+    # MULAI INSPEKSI
     # =====================================================================
     def mulai_inspeksi(self):
         if self.auto_reset_timer is not None:
@@ -613,7 +612,7 @@ class MainController:
             self.ui.update_status("Ditolak: Operator belum login!", STATUS_COLORS["fail"])
             return
 
-        # --- MEKANISME OFFLINE ---
+        # MEKANISME OFFLINE
         if MODE_OFFLINE:
             file_path = filedialog.askopenfilename(
                 title="Pilih Gambar untuk Inspeksi",
@@ -633,7 +632,7 @@ class MainController:
                 
             # Set gambar dari lokal sebagai frame saat ini
             self.current_frame = img_bgr
-        # ------------------------
+
         else:
             if self.current_frame is None:
                 self.ui.update_status("Gagal: Belum memuat gambar dari kamera!", STATUS_COLORS["fail"])
@@ -659,7 +658,7 @@ class MainController:
         detected_items, result_image_bgr = self.engine.run_inference(self.current_frame, current_model)
         
         try:
-            # Render paksa frame hasil deteksi (terutama untuk offline mode karena kamera tidak update canvas)
+            # Render paksa frame hasil deteksi
             self.ui.camera_canvas.update()
             canvas_w = self.ui.camera_canvas.winfo_width()
             canvas_h = self.ui.camera_canvas.winfo_height()
