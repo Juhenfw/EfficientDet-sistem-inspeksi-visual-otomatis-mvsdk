@@ -21,7 +21,7 @@ from utils.utils import preprocess, invert_affine, postprocess
 # --- IMPORT MINDVISION KAMERA ---
 import mvsdk 
 
-# Import UI terbaru (Pastikan nama file dan foldernya benar)
+# Import UI terbaru
 from GUI_v5 import InspectionUI, STATUS_COLORS, get_scaled_size
 
 # =====================================================================
@@ -31,10 +31,10 @@ STATION_MODE = 2  # 1 untuk Aksesoris, 2 untuk Case & Pianika
 KAMERA_INDEX = 1  # 0 untuk kamera pertama yg tercolok, 1 untuk yg kedua
 SHARED_FILE = "antrean_produksi.json" 
 CONFIG_FILE = "configs/camera2_config.json"
-OPERATOR_FILE = "configs/operator.json" # <--- File baru untuk NIK & Nama
+OPERATOR_FILE = "configs/operator.json" # File Data untuk NIK & Nama Operator
 
 # =====================================================================
-# KELAS MANAJEMEN ANTREAN CERDAS (SMART QUEUE IPC)
+# SMART QUEUE IPC (Inter-Process Communication)
 # =====================================================================
 class SyncManager:
     def __init__(self, file_path=SHARED_FILE):
@@ -78,7 +78,7 @@ class SyncManager:
         self.write_data(data)
 
 # =====================================================================
-# KELAS DATA MANAJER (STATISTIK HARIAN & LOGGING CSV)
+# STATISTIK HARIAN & LOGGING CSV
 # =====================================================================
 class DataManager:
     def __init__(self, station_id):
@@ -140,7 +140,7 @@ class DataManager:
             print(f"[LOG ERROR] Gagal menulis ke CSV: {e}")
 
 # =====================================================================
-# KELAS LOGIKA AI & INSPEKSI (TETAP SAMA SEPERTI SEBELUMNYA)
+# LOGIKA AI & INSPEKSI
 # =====================================================================
 class InspectionEngine:
     def __init__(self):
@@ -237,13 +237,13 @@ class InspectionEngine:
         temp_path = "temp_inference.bmp"
         cv2.imwrite(temp_path, result_image)
 
-        # 1. Gambar zona kalibrasi
+        # Gambar zona kalibrasi
         for obj_name, rel_coords in active_zones.items():
             rx1, ry1 = int(rel_coords[0] * img_w), int(rel_coords[1] * img_h)
             rx2, ry2 = int(rel_coords[2] * img_w), int(rel_coords[3] * img_h)
-            # Gunakan zone_thickness
+            # zone_thickness
             cv2.rectangle(result_image, (rx1, ry1), (rx2, ry2), (0, 255, 0), zone_thickness)
-            # Gunakan zone_font_scale
+            # zone_font_scale
             cv2.putText(result_image, f"Zone {obj_name}", (rx1, ry1-5), 
                         cv2.FONT_HERSHEY_SIMPLEX, zone_font_scale, (0, 255, 0), 1)
 
@@ -286,7 +286,7 @@ class InspectionEngine:
                     status_teks = "OK" if posisi_ok else "SALAH"
                     detected_items_status[class_name] = status_teks
                     
-                    # --- LOGIKA VISUALISASI DENGAN VARIABEL ---
+                    # LOGIKA VISUALISASI DENGAN VARIABEL
                     box_color = (255, 255, 0) if posisi_ok else (0, 0, 255) 
                     
                     # A. Gambar Bounding Box utama
@@ -333,11 +333,11 @@ class InspectionEngine:
                 if status_posisi == "OK":
                     hasil_display.append((target.replace('_', ' ').title(), "Lolos", "✓", STATUS_COLORS.get("pass", "#2ECC71")))
                 else:
-                    # Kalau terdeteksi tapi IoU-nya meleset (Salah Posisi)
+                    # Display jika terdeteksi tapi IoU-nya meleset (Salah Posisi)
                     hasil_display.append((target.replace('_', ' ').title(), "NG (Posisi/Hilang)", "⚠", STATUS_COLORS.get("fail", "#E74C3C")))
                     missing_items.append(f"{target} (NG)")
             else:
-                # Kalau AI buta karena barang ditaruh sembarangan (Tidak Ada)
+                # Display karena barang ditaruh sembarangan (Tidak ada objek)
                 hasil_display.append((target.replace('_', ' ').title(), "NG (Posisi/Hilang)", "✗", STATUS_COLORS.get("fail", "#E74C3C")))
                 missing_items.append(f"{target} (NG)")
                 
@@ -372,14 +372,14 @@ class MainController:
         
         self.stats = self.data_mgr.load_daily_stats() 
         
-        # --- BINDING UI BARU ---
+        # Integrasi UI
         self.ui.btn_inspect.configure(command=self.mulai_inspeksi)  # Dulu ambil gambar
         self.ui.btn_save.configure(command=self.simpan_hasil)       # Dulu mulai inspeksi
         self.ui.btn_reset.configure(command=self.reset_sistem)
         self.ui.exit_btn.configure(command=self.exit_aplikasi)
         self.ui.root.protocol("WM_DELETE_WINDOW", self.exit_aplikasi)
         
-        # Binding saat dropdown model berubah
+        # dropdown model
         self.ui.model_dropdown.configure(command=self.on_model_change)
         
         # Variabel Status Operator
@@ -389,13 +389,13 @@ class MainController:
         
         # Setup Awal UI
         self.setup_ui_station()
-        # --- LOGIKA OPERATOR BARU ---
+        # --- LOGIKA OPERATOR ---
         self.operator_db = []
         self.load_operator_db() # Load database JSON
         self.ui.entry_notag.bind("<Return>", self.proses_scan_notag) # Deteksi jika alat scan menekan Enter
         self.ui.btn_ok_tag.configure(command=self.proses_scan_notag) # Untuk Touchscreen
         self.ui.entry_notag.focus() # Auto-fokus kursor ke kolom input saat aplikasi dibuka
-        # ----------------------------
+
         self.update_ui_stats()
         self.update_guide_image(self.ui.model_dropdown.get()) # Load Gambar Panduan Awal
         
@@ -403,7 +403,7 @@ class MainController:
         self.init_camera()
         if STATION_MODE == 2: self.pantau_status_station1()
 
-    # --- Fungsi Bantuan untuk Mengunci/Membuka Tombol ---
+    # Fungsi Bantuan untuk Mengunci/Membuka Tombol
     def kunci_tombol_inspeksi(self):
         self.ui.btn_inspect.configure(state="disabled", fg_color="#7F8C8D")
         self.ui.btn_save.configure(state="disabled", fg_color="#7F8C8D")
@@ -413,7 +413,7 @@ class MainController:
         self.ui.btn_inspect.configure(state="normal", fg_color=STATUS_COLORS["accent"])
         self.ui.btn_save.configure(state="normal", fg_color=STATUS_COLORS["pass"])
 
-    # --- FUNGSI BARU UNTUK UI 3 KOLOM ---
+    # Informasi Operator
     def load_operator_db(self):
         """Membaca file JSON yang berisi daftar operator (berbentuk List)"""
         try:
@@ -441,7 +441,7 @@ class MainController:
                 self.ui.set_operator_info(op.get("nik"), op.get("nama"))
                 operator_ditemukan = True
                 
-                # --- REVISI 3: Simpan Data Operator & Buka Kunci Tombol ---
+                # Simpan Data Operator & Buka Kunci Tombol
                 self.operator_aktif = op 
                 self.buka_tombol_inspeksi()
                 self.ui.update_status(f"Login Sukses: {op.get('nama')}. Siap Inspeksi.", STATUS_COLORS["pass"])
@@ -458,7 +458,7 @@ class MainController:
         """Memperbarui gambar panduan di panel kiri sesuai model yang dipilih"""
         is_pink = "Pink" in model_name or "P32EP" in model_name
         
-        # Pastikan Anda meletakkan gambar panduan di dalam folder assets
+        # Path Gambar Panduan Inspeksi
         img_path = "assets/guide_station_1_pink.jpg" if is_pink else "assets/guide_station_1_biru.jpg"
         
         if STATION_MODE == 2:
@@ -538,10 +538,9 @@ class MainController:
             self.ui.lbl_cam_status.configure(text="● ONLINE", text_color="white")
             self.ui.update_status("Kamera Siap.", STATUS_COLORS["info"])
             
-            # --- PERBAIKAN 1: Matikan Placeholder ---
+            # Matikan Placeholder
             # Mencegah canvas terus-menerus menggambar ulang teks "Menunggu Kamera" saat ukuran jendela berubah
             self.ui.camera_canvas.unbind("<Configure>")
-            # ----------------------------------------
             
             self.update_video_feed()
             
@@ -559,7 +558,7 @@ class MainController:
             
             if os.name == 'nt': mvsdk.CameraFlipFrameBuffer(self.pFrameBuffer, FrameHead, 1)
             
-            # --- PERBAIKAN 2: Penentuan Ukuran Buffer Array yang Akurat ---
+            # Penentuan Ukuran Buffer Array
             channels = 1 if FrameHead.uiMediaType == mvsdk.CAMERA_MEDIA_TYPE_MONO8 else 3
             buffer_size = FrameHead.iHeight * FrameHead.iWidth * channels
             frame_data = (mvsdk.c_ubyte * buffer_size).from_address(self.pFrameBuffer)
@@ -583,7 +582,7 @@ class MainController:
                         
                     frame_resized = cv2.resize(frame, (max(1, new_w), max(1, new_h)))
                     
-                    # --- PERBAIKAN 3: Konversi Warna Aman ---
+                    # Konversi Warna Aman
                     if channels == 3:
                         img_rgb = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
                     else:
@@ -599,13 +598,12 @@ class MainController:
             if e.error_code != mvsdk.CAMERA_STATUS_TIME_OUT: 
                 print(f"[KAMERA SDK] Skip frame: {e}")
                 
-        # --- PERBAIKAN 4: Tangkap Semua Error ---
+        # Tangkap Semua Error
         except Exception as e:
             print(f"[VIDEO LOOP ERROR] {e}") # Print error jika numpy/cv2 gagal
             
         finally:
-            # --- PERBAIKAN 5: Pastikan Loop Selalu Berjalan ---
-            # Dengan taruh di 'finally', meskipun ada 1 frame yang corrupt, 
+            # Memastikan Loop Selalu Berjalan
             # aplikasi tidak akan mati dan akan terus mengambil frame berikutnya.
             if self.camera_running:
                 self.root.after(30, self.update_video_feed)
@@ -620,7 +618,7 @@ class MainController:
             if isinstance(widget, ctk.CTkLabel) and "OFFLINE MODE" in widget.cget("text"):
                 widget.configure(text=f"OFFLINE MODE (STATION 2) - Antrean {model_singkat}: {antrean_model_ini}")
 
-        # --- PERBAIKAN LOGIKA INTERLOCK STATION 2 ---
+        # LOGIKA INTERLOCK STATION 2
         if self.operator_aktif is None:
             # Syarat 1 Gagal: Operator belum scan -> Paksa tombol terkunci
             if self.ui.btn_inspect.cget("state") == "normal":
@@ -642,7 +640,7 @@ class MainController:
         self.root.after(500, self.pantau_status_station1)
 
     # =====================================================================
-    # LOGIKA BARU: MULAI INSPEKSI (Hanya Analisis & Tahan Layar)
+    # MULAI INSPEKSI
     # =====================================================================
     def mulai_inspeksi(self):
         # Batalkan timer reset yang mungkin masih berjalan dari sesi sebelumnya
@@ -664,11 +662,11 @@ class MainController:
         self.root.update_idletasks() 
         
         # =========================================================
-        # [START TIMER]: Catat waktu mulai dengan presisi tinggi
+        # Mencatat waktu mulai inspeksi
         # =========================================================
         start_time = time.perf_counter()
         
-        # 0. Simpan gambar mentah (raw) saat ini ke folder MANUAL
+        # Simpan gambar mentah (raw) saat ini ke folder MANUAL
         waktu_raw = datetime.now().strftime("%H%M%S")
         nama_file_raw = f"{current_model.split(' ')[2]}_{waktu_raw}_RAW.jpg"
         path_simpan_raw = os.path.join(self.data_mgr.base_img_path, "MANUAL", nama_file_raw)
@@ -679,10 +677,10 @@ class MainController:
         except Exception as e:
             print(f"[LOG ERROR] Gagal menyimpan gambar raw: {e}")
         
-        # 1. Jalankan Inferensi AI
+        # Jalankan Inferensi AI
         detected_items, result_image_bgr = self.engine.run_inference(self.current_frame, current_model)
         
-        # 2. Tampilkan Hasil Visual ke Canvas
+        # Tampilkan Hasil Visual ke Canvas
         try:
             canvas_w = self.ui.camera_canvas.winfo_width()
             canvas_h = self.ui.camera_canvas.winfo_height()
@@ -706,30 +704,30 @@ class MainController:
         except Exception as e: 
             print(f"[UI ERROR] Gagal merender freeze frame: {e}")
 
-        # 3. Evaluasi Hasil Kelengkapan & Tampilkan List
+        # Evaluasi Hasil Kelengkapan & Tampilkan List
         is_pass, hasil_display, missing_items = self.engine.evaluasi_hasil(detected_items, current_model)
         self.update_list_komponen(hasil_display)
         
         # =========================================================
-        # [STOP TIMER]: Catat waktu selesai dan hitung selisihnya
+        # Mencatat waktu selesai dan hitung selisihnya
         # =========================================================
         end_time = time.perf_counter()
         latency_ms = (end_time - start_time) * 1000 # Konversi ke milidetik
 
-        # 4. SIMPAN STATE KE VARIABEL CACHE (Untuk dipakai saat tekan tombol Simpan)
+        # SIMPAN STATE KE VARIABEL CACHE (Untuk dipakai saat tekan tombol "Simpan")
         self.last_eval_pass = is_pass
         self.last_missing_items = missing_items
         self.last_result_image = result_image_bgr
         self.last_model_inspected = current_model
-        self.last_latency_ms = latency_ms # [REVISI TIMER]: Simpan nilai latency ke dalam cache
+        self.last_latency_ms = latency_ms
 
-        # 5. Tampilkan Informasi ke Terminal dan UI
+        # Tampilkan Informasi ke Terminal dan UI
         print(f"[LATENCY] Waktu Eksekusi Inspeksi: {latency_ms:.2f} ms")
         status_text = f"Inspeksi Selesai ({latency_ms:.0f} ms). Silakan klik SIMPAN HASIL."
         self.ui.update_status(status_text, STATUS_COLORS["info"])
 
     # =====================================================================
-    # LOGIKA BARU: SIMPAN HASIL (Statistik, IPC, & Rekam Gambar)
+    # SIMPAN HASIL (Statistik, IPC, & Rekam Gambar)
     # =====================================================================
     def simpan_hasil(self):
         # Proteksi: Pastikan operator sudah menekan 'Mulai Inspeksi' sebelumnya
@@ -747,7 +745,7 @@ class MainController:
         current_model = self.last_model_inspected
         latency_ms = getattr(self, 'last_latency_ms', 0.0)
 
-        # 1. Update Statistik JSON
+        # Update Statistik JSON Harian
         if current_model not in self.stats:
             self.stats[current_model] = {"total": 0, "pass": 0, "fail": 0}
             
@@ -765,24 +763,24 @@ class MainController:
 
         self.update_ui_stats()
         self.simpan_stats()
-        # --- REVISI 5: Kirim self.operator_aktif ke pencatat CSV ---
+        # Kirim self.operator_aktif ke pencatat CSV ---
         self.data_mgr.catat_log_csv(current_model, is_pass, missing_items, self.operator_aktif, latency_ms)
 
-        # 2. Simpan Gambar AI ke Folder PASS/FAIL
+        # Simpan Gambar AI ke Folder PASS/FAIL
         waktu_file = datetime.now().strftime("%H%M%S")
         sub_folder = "PASS" if is_pass else "FAIL"
         nama_file_ai = f"{current_model.split(' ')[2]}_{waktu_file}_{sub_folder}.jpg"
         path_simpan_ai = os.path.join(self.data_mgr.base_img_path, sub_folder, nama_file_ai)
         cv2.imwrite(path_simpan_ai, result_image_bgr)
 
-        # 3. Beri notifikasi berhasil dan jalankan auto-reset
+        # Beri notifikasi berhasil dan jalankan auto-reset
         notif_color = STATUS_COLORS["pass"] if is_pass else STATUS_COLORS["fail"]
         self.ui.update_status(f"Disimpan ({status_teks}). Auto-reset 3s...", notif_color)
         
         if self.auto_reset_timer: 
             self.root.after_cancel(self.auto_reset_timer)
-        # self.auto_reset_timer = self.root.after(3000, self.reset_sistem)
-        self.auto_reset_timer = self.root.after(1000, self.reset_sistem)
+        # self.auto_reset_timer = self.root.after(3000, self.reset_sistem) # 3 detik
+        self.auto_reset_timer = self.root.after(1000, self.reset_sistem) # 1 detik
 
     def update_list_komponen(self, hasil_display):
         for widget in self.ui.comp_scroll.winfo_children(): widget.destroy()
