@@ -1,12 +1,5 @@
-# train_optimized.py - Memory-Efficient Training with Mixup
-"""
-Optimized training script dengan:
-- Memory optimization (gradient accumulation, cache clearing)
-- Mixup augmentation untuk better generalization
-- Clean code structure
-- Better error handling
-- Complete metrics (mAP, F1, Precision, Recall)
-"""
+# original author: signatrix, Zylo117
+# modified by Juhenfw
 
 import argparse
 import datetime
