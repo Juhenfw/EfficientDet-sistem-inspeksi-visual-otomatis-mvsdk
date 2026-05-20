@@ -44,7 +44,7 @@ Proyek ini terbagi menjadi dua modul fungsional utama:
 ---
 
 ## Spesifikasi Sistem (Hardware Reference)
-* **Kamera**: 2x Kamera Industri HT-SUA501GC-TIV-C (Sensor 2/3" CMOS, 5MP, 40 FPS).
+* **Kamera**: 2 Kamera Industrial HT-SUA501GC-TIV-C (Sensor 2/3" CMOS, 5MP, 40 FPS).
 * **Unit Pemrosesan**: Laptop/Mini PC (Intel Core i7, RAM 16GB, GPU NVIDIA RTX 4060 8GB).
 
 ---
