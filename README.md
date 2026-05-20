@@ -24,7 +24,7 @@ Penelitian ini mengembangkan sistem inspeksi visual otomatis berbasis kamera gan
 ---
 
 ## Performa dan Hasil Eksperimen
-Berdasarkan evaluasi terhadap 432 sampel citra validasi:
+Berdasarkan evaluasi internal terhadap 432 sampel citra validasi:
 * **mAP@0.50**: 0,9932.
 * **F1-Score**: 0,9927.
 
