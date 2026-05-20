@@ -24,10 +24,12 @@ Penelitian ini mengembangkan sistem inspeksi visual otomatis berbasis kamera gan
 ---
 
 ## Performa dan Hasil Eksperimen
-Berdasarkan evaluasi terhadap 2.441 sampel citra operasional di lapangan:
-* **Varian Model Terbaik**: EfficientDet-D1.
+Berdasarkan evaluasi terhadap 432 sampel citra validasi:
 * **mAP@0.50**: 0,9932.
 * **F1-Score**: 0,9927.
+
+Berdasarkan evaluasi terhadap 2.441 sampel citra operasional yang didapatkan secara langsung di lapangan:
+* **Varian Model Terbaik**: EfficientDet-D1.
 * **Akurasi Lapangan**: 99,4% (Stasiun Aksesori) dan 97,8% (Stasiun Unit Utama).
 
 ---
