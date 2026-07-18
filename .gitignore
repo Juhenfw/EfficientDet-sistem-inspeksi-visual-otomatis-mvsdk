@@ -1,0 +1,9 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Folder model/dataset yang ukurannya terlalu besar (opsional, sesuaikan kebutuhan)
+Training-EfficientDet/datasets/
+Software-Inspeksi/models/
