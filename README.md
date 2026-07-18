@@ -1,3 +1,5 @@
+*Read this in other languages: [English](README_en.md)*
+
 # Sistem Inspeksi Visual Otomatis Berbasis EfficientDet
 
 Repositori ini merupakan hasil implementasi dari penelitian Tugas Akhir (Skripsi) yang berjudul **"Implementasi EfficientDet untuk Deteksi Komponen dan Klasifikasi Kelengkapan Alat Musik Pianika pada Sistem Inspeksi di PT. XYZ"**.
