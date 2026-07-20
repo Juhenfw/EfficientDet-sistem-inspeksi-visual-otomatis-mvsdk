@@ -1,3 +1,5 @@
+*Read this in other languages: [English](readme_en.md)*
+
 # Software Inspeksi Visual Otomatis (QC Pianika)
 
 Direktori ini berisi rangkaian perangkat lunak operasional untuk **Sistem Inspeksi Visual Otomatis** pada lini produksi Pianika. Perangkat lunak ini mengintegrasikan pengambilan gambar dari kamera industri, inferensi AI real-time menggunakan EfficientDet, dan manajemen data produksi.
