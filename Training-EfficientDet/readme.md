@@ -1,3 +1,5 @@
+*Read this in other languages: [English](readme_en.md)*
+
 # Yet Another EfficientDet Pytorch (Optimized Implementation)
 
 Implementasi ulang EfficientDet menggunakan PyTorch ini dikembangkan untuk mereproduksi algoritma resmi Google AutoML secara akurat. Proyek ini secara khusus telah diadopsi dan dioptimalkan untuk mendukung [Sistem Inspeksi Visual Otomatis](../Software-Inspeksi/), yang bertujuan untuk melakukan deteksi komponen secara real-time pada lini produksi instrumen musik (studi kasus: Pianika).
