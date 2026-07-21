@@ -1,0 +1,18 @@
+# EfficientDet Industrial Visual Inspection System (MVSDK)
+
+> An end-to-end Automatic Optical Inspection (AOI) software and training pipeline for industrial production lines using MindVision SDK cameras and custom PyTorch EfficientDet (D0/D1) architecture.
+
+## System Overview
+- Domain: Industrial Machine Vision & Quality Control (specifically tested on Pianika musical instrument assembly).
+- Hardware Integration: MindVision Industrial Camera via `mvsdk.py` SDK.
+- Deep Learning Framework: PyTorch EfficientDet (D0 & D1 variants) with custom SyncBatchNorm and EfficientNet backbone.
+- System Architecture: Dual-station setup (`main_system_station1.py` & `main_system_station2.py`) with cross-station `sync_manager.py` and real-time GUI (`GUI_v5.py`).
+
+## Key Directory Structure
+- `/Software-Inspeksi`: Runtime deployment codebase, station scripts, zone calibration, GUI, and hardware integration.
+- `/Training-EfficientDet`: Dataset handling (COCO format), training scripts (`train_d0.py`, `train_d1.py`), auto-labeling, and evaluation reporting tools.
+
+## Primary Use Cases
+1. Real-time product defect/part detection on industrial assembly lines.
+2. Zone-based camera inspection calibration (`Calibrate_Zone.py`, `Calibrate_Camera.py`).
+3. Dual-station inspection synchronization and production log tracking (`log_produksi_station_1.csv`).
