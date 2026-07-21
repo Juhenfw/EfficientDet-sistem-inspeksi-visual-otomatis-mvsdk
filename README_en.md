@@ -19,6 +19,24 @@ This research develops an automated visual inspection system based on dual camer
 * **Data-Centric Approach**: Utilizes an object isolation strategy and hard negative samples (empty containers) to improve model robustness against light reflections and visual disturbances on the factory floor.
 * **High-Speed Performance**: Average system response time (latency) is around 0.55 to 0.56 seconds, meeting the industrial productivity target of under 2 seconds per package.
 
+## System Architecture
+
+The workflow is designed to process image frames synchronously across two stations, validate component presence using the AI model, and log production records in real-time.
+
+```mermaid
+graph TD
+    A[Hardware: MindVision Cameras] -->|mvsdk.py| B(Core: Software-Inspeksi)
+    B --> C{Inspection Station}
+    C -->|Station 1: Accessories| D[main_system_station1.py]
+    C -->|Station 2: Main Unit| E[main_system_station2.py]
+    D & E --> F((EfficientDet-D1 Model))
+    F --> G[Spatial Logic Filter / IoU 0.3]
+    G --> H[sync_manager.py / IPC]
+    H --> I[CustomTkinter GUI & CSV Logs]
+```
+
+---
+
 ## Performance and Experimental Results
 Based on internal evaluation of 432 validation image samples:
 * **mAP@0.50**: 0.9932.
@@ -40,13 +58,54 @@ This project is divided into two main functional modules:
 * **Cameras**: 2 Industrial Cameras HT-SUA501GC-TIV-C (2/3" CMOS Sensor, 5MP, 40 FPS).
 * **Processing Unit**: Laptop/Mini PC (Intel Core i7, 16GB RAM, NVIDIA RTX 4060 8GB GPU).
 
+## Quick Start
+
+The following guide details how to set up the environment and run the inspection software simulation without requiring physical industrial camera hardware.
+
+### 1. Prerequisites
+* **Python 3.10**
+* Optimized for **Edge Computing** deployment (e.g., industrial Mini PCs). A CUDA-enabled GPU is optional for maximum throughput acceleration, but the system is fully capable of running on standard edge CPUs.
+
+### 2. Installation
+Clone the repository and install all required dependencies:
+
+```bash
+# Clone the repository
+git clone [https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk.git](https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk.git)
+cd EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk
+
+# Install dependencies
+pip install -r Training-EfficientDet/requirements.txt
+```
+
+### 3. Model Weights Setup
+Due to GitHub file size limitations, pre-trained model weights (`.pth` files) are hosted externally.
+1. Download the EfficientDet-D1 weights from [Release v1.2.8](https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk/releases/tag/v1.2.8).
+2. Place the downloaded `.pth` file inside the `Software-Inspeksi/models/` directory.
+
+### 4. Running System Simulation
+The software includes simulation scripts using dummy sample images, allowing full GUI and IPC integration testing without physical MindVision cameras attached.
+
+```bash
+# Navigate to operational software directory
+cd Software-Inspeksi
+
+# Terminal 1: Launch Station 1 GUI simulation (Accessories)
+python main_system_station1_simulation.py
+
+# Terminal 2: Launch Station 2 GUI simulation (Main Unit)
+python main_system_station2_simulation.py
+```
+
+---
+
 ## Citation
 If you use the code or research results from this repository, please provide attribution in the following format:
 
-> **Bahasa Indonesia:**
+**Bahasa Indonesia:**
 > Wildan, J. F. (2026). Implementasi EfficientDet untuk Deteksi Komponen dan Klasifikasi Kelengkapan Alat Musik Pianika pada Sistem Inspeksi di PT. XYZ. Skripsi. Surabaya: Universitas Airlangga.
 > 
-> **English:**
+**English:**
 > Wildan, J. F. (2026). Implementation of EfficientDet for Component Detection and Completeness Classification of Melodica Musical Instruments in the Inspection System at PT. XYZ. Undergraduate Thesis. Surabaya: Universitas Airlangga.
 
 ## Author

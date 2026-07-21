@@ -25,6 +25,24 @@ Penelitian ini mengembangkan sistem inspeksi visual otomatis berbasis kamera gan
 
 ---
 
+## Arsitektur Sistem
+
+Alur kerja sistem dirancang untuk memproses tangkapan gambar secara sinkron antara dua stasiun, memvalidasi komponen menggunakan model AI, dan mencatat hasil produksi secara *real-time*.
+
+```mermaid
+graph TD
+    A[Hardware: MindVision Cameras] -->|mvsdk.py| B(Core: Software-Inspeksi)
+    B --> C{Stasiun Inspeksi}
+    C -->|Stasiun 1: Aksesori| D[main_system_station1.py]
+    C -->|Stasiun 2: Unit Utama| E[main_system_station2.py]
+    D & E --> F((Model EfficientDet-D1))
+    F --> G[Filter Logika Spasial / IoU 0.3]
+    G --> H[sync_manager.py / IPC]
+    H --> I[GUI CustomTkinter & Log CSV]
+```
+
+---
+
 ## Performa dan Hasil Eksperimen
 Berdasarkan evaluasi internal terhadap 432 sampel citra validasi:
 * **mAP@0.50**: 0,9932.
@@ -53,15 +71,56 @@ Proyek ini terbagi menjadi dua modul fungsional utama:
 
 ---
 
+## Mulai Cepat (Quick Start)
+
+Panduan berikut menunjukkan cara mengatur lingkungan (*environment*) dan menjalankan simulasi perangkat lunak inspeksi tanpa memerlukan perangkat keras kamera fisik.
+
+### 1. Prasyarat
+* **Python 3.10**
+* Dioptimalkan untuk implementasi **Edge Computing** (seperti Mini PC industri). Penggunaan GPU dengan dukungan CUDA bersifat opsional untuk akselerasi maksimal (*high-throughput*), namun sistem tetap dapat berjalan pada CPU *edge* standar.
+
+### 2. Instalasi
+Clone repositori dan instal seluruh pustaka pendukung yang dibutuhkan:
+
+```bash
+# Clone repositori
+git clone [https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk.git](https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk.git)
+cd EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk
+
+# Instal dependensi
+pip install -r Training-EfficientDet/requirements.txt
+```
+
+### 3. Persiapan Model (*Weights*)
+Karena batas ukuran file di GitHub, *pre-trained weights* (file `.pth`) disimpan secara terpisah.
+1. Unduh *weights* EfficientDet-D1 dari [Release v1.2.8](https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk/releases/tag/v1.2.8).
+2. Letakkan file `.pth` tersebut di dalam direktori `Software-Inspeksi/models/`.
+
+### 4. Menjalankan Simulasi Sistem
+Sistem dilengkapi dengan skrip simulasi menggunakan *dummy data* (gambar sampel lokal) sehingga pengujian antarmuka GUI dan logika integrasi dapat dilakukan tanpa kamera MindVision.
+
+```bash
+# Pindah ke direktori perangkat lunak operasional
+cd Software-Inspeksi
+
+# Terminal 1: Jalankan simulasi GUI Stasiun 1 (Aksesori)
+python main_system_station1_simulation.py
+
+# Terminal 2: Jalankan simulasi GUI Stasiun 2 (Unit Utama)
+python main_system_station2_simulation.py
+```
+
+---
+
 ## Sitasi (Citation)
 
 Jika Anda menggunakan kode atau hasil penelitian dari repositori ini, harap berikan atribusi sesuai format berikut:
 
-**Bahasa Indonesia:**\
-Wildan, J. F. (2026). Implementasi EfficientDet untuk Deteksi Komponen dan Klasifikasi Kelengkapan Alat Musik Pianika pada Sistem Inspeksi di PT. XYZ. Skripsi. Surabaya: Universitas Airlangga.
+**Bahasa Indonesia:**
+> Wildan, J. F. (2026). Implementasi EfficientDet untuk Deteksi Komponen dan Klasifikasi Kelengkapan Alat Musik Pianika pada Sistem Inspeksi di PT. XYZ. Skripsi. Surabaya: Universitas Airlangga.
 
-**English:**\
-Wildan, J. F. (2026). Implementation of EfficientDet for Component Detection and Completeness Classification of Melodica Musical Instruments in the Inspection System at PT. XYZ. Undergraduate Thesis. Surabaya: Universitas Airlangga.
+**English:**
+> Wildan, J. F. (2026). Implementation of EfficientDet for Component Detection and Completeness Classification of Melodica Musical Instruments in the Inspection System at PT. XYZ. Undergraduate Thesis. Surabaya: Universitas Airlangga.
 
 ---
 
