@@ -1,5 +1,3 @@
-# File 4: README_zh.md (Chinese)
-
 <div align="center">
 
   <a href="README.md">Bahasa Indonesia</a> &nbsp;|&nbsp;
@@ -21,7 +19,7 @@
   <img src="https://img.shields.io/badge/Accuracy-99.4%25-333333?style=flat-square" alt="Accuracy"/>
   <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License"/>
 
-  <br><br>
+  <br>
 
 </div>
 
