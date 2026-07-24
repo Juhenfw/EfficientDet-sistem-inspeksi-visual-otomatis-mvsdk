@@ -1,15 +1,42 @@
-*Read this in other languages: [English](README_en.md)*
+<div align="center">
+
+  <b>Bahasa Indonesia</b> &nbsp;|&nbsp;
+  <a href="README_en.md">English</a> &nbsp;|&nbsp;
+  <a href="README_ja.md">日本語</a> &nbsp;|&nbsp;
+  <a href="README_zh.md">中文</a>
+
+  <br>
+
+  <img src="https://img.shields.io/badge/Python-3.10-black?style=flat-square&logo=python" alt="Python 3.10"/>
+  <img src="https://img.shields.io/badge/PyTorch-1.12+-black?style=flat-square&logo=pytorch" alt="PyTorch"/>
+  <img src="https://img.shields.io/badge/GUI-CustomTkinter-black?style=flat-square" alt="CustomTkinter"/>
+  <img src="https://img.shields.io/badge/Hardware-MindVision-black?style=flat-square" alt="MindVision SDK"/>
+  
+  <br>
+
+  <img src="https://img.shields.io/badge/mAP@0.50-0.9932-333333?style=flat-square" alt="mAP@0.50"/>
+  <img src="https://img.shields.io/badge/Latency-0.55s-333333?style=flat-square" alt="Latency"/>
+  <img src="https://img.shields.io/badge/Accuracy-99.4%25-333333?style=flat-square" alt="Accuracy"/>
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=flat-square" alt="License"/>
+
+  <br><br>
+
+</div>
 
 # Sistem Inspeksi Visual Otomatis Berbasis EfficientDet
 
 Repositori ini merupakan hasil implementasi dari penelitian Tugas Akhir (Skripsi) yang berjudul **"Implementasi EfficientDet untuk Deteksi Komponen dan Klasifikasi Kelengkapan Alat Musik Pianika pada Sistem Inspeksi di PT. XYZ"**.
 
-Sistem ini dirancang untuk mengotomatisasi pengendalian mutu pada tahap pengepakan akhir produk pianika guna meminimalisir risiko kesalahan identifikasi akibat kelelahan manusia (*human error*).
+Sistem ini dirancang untuk mengotomatisasi pengendalian mutu pada tahap pengepakan akhir produk pianika guna meminimalisir risiko kesalahan identifikasi akibat kelelahan manusia (*human error*). 
+
+Proses inspeksi pada perangkat lunak ini beroperasi melalui **dua tahapan utama yang saling berkesinambungan**:
+1. **Deteksi Objek (Object Detection):** Model EfficientDet mengidentifikasi dan melokalisasi koordinat dari setiap komponen yang ada di dalam kemasan.
+2. **Klasifikasi Kelengkapan (Completeness Classification):** Sistem mengekstrak hasil deteksi objek tersebut, lalu menganalisisnya menggunakan logika spasial untuk mengklasifikasikan apakah kelengkapan paket tersebut berstatus **Lengkap (Pass)** atau **Tidak Lengkap/Cacat Susunan (Fail)**.
 
 ---
 
 ## Ringkasan Proyek
-Penelitian ini mengembangkan sistem inspeksi visual otomatis berbasis kamera ganda yang menggunakan arsitektur *Deep Learning* EfficientDet untuk mendeteksi sembilan kategori komponen dan mengklasifikasikan kelengkapan paket secara *real-time*.
+Penelitian ini mengembangkan sistem inspeksi visual otomatis berbasis kamera ganda yang menggunakan arsitektur *Deep Learning* EfficientDet. Sistem mendeteksi sembilan kategori komponen secara *real-time*.
 
 ### Kategori Objek Deteksi:
 * **Aksesori**: *Hose* (selang), *Mouthpiece* (corong tiup), Label, Buku Manual, dan *Leaflet*.
@@ -27,7 +54,7 @@ Penelitian ini mengembangkan sistem inspeksi visual otomatis berbasis kamera gan
 
 ## Arsitektur Sistem
 
-Alur kerja sistem dirancang untuk memproses tangkapan gambar secara sinkron antara dua stasiun, memvalidasi komponen menggunakan model AI, dan mencatat hasil produksi secara *real-time*.
+Alur kerja dirancang untuk memproses tangkapan gambar secara sinkron antara dua stasiun, mendeteksi keberadaan objek menggunakan AI, mengklasifikasikan kelengkapan paket, dan mencatat hasil produksi secara *real-time*.
 
 ```mermaid
 graph TD
@@ -35,8 +62,15 @@ graph TD
     B --> C{Stasiun Inspeksi}
     C -->|Stasiun 1: Aksesori| D[main_system_station1.py]
     C -->|Stasiun 2: Unit Utama| E[main_system_station2.py]
+    
+    subgraph Tahap 1: Deteksi Objek
     D & E --> F((Model EfficientDet-D1))
+    end
+    
+    subgraph Tahap 2: Klasifikasi Kelengkapan
     F --> G[Filter Logika Spasial / IoU 0.3]
+    end
+    
     G --> H[sync_manager.py / IPC]
     H --> I[GUI CustomTkinter & Log CSV]
 ```
@@ -44,13 +78,18 @@ graph TD
 ---
 
 ## Performa dan Hasil Eksperimen
-Berdasarkan evaluasi internal terhadap 432 sampel citra validasi:
-* **mAP@0.50**: 0,9932.
-* **F1-Score**: 0,9927.
+Karena arsitektur sistem ini terbagi menjadi dua tahap (*Detection* dan *Classification*), metrik performa dievaluasi secara terpisah pada masing-masing proses untuk memastikan akurasi maksimal di lingkungan industri.
 
-Berdasarkan evaluasi terhadap 2.441 sampel citra operasional yang didapatkan secara langsung di lapangan:
-* **Varian Model Terbaik**: EfficientDet-D1.
-* **Akurasi Lapangan**: 99,4% (Stasiun Aksesori) dan 97,8% (Stasiun Unit Utama).
+### 1. Evaluasi Tahap Deteksi Objek (Object Detection Metrics)
+Metrik ini mengukur seberapa presisi model AI dalam mengenali dan melokalisasi komponen tunggal. Berdasarkan evaluasi internal terhadap 432 sampel citra validasi:
+* **mAP@0.50**: 0,9932.
+
+### 2. Evaluasi Tahap Klasifikasi Kelengkapan (Completeness Classification Metrics)
+Metrik ini mengukur keandalan sistem secara keseluruhan dalam memberikan keputusan akhir (Pass/Fail) setelah hasil deteksi objek diproses oleh algoritma logika spasial.
+* **F1-Score**: 0,9927 (Berdasarkan 432 sampel validasi internal).
+* **Akurasi Lapangan (Field Accuracy)**: Berdasarkan evaluasi terhadap 2.441 sampel citra operasional yang didapatkan secara langsung di lapangan pabrik:
+  * **99,4%** (Akurasi Klasifikasi di Stasiun Aksesori).
+  * **97,8%** (Akurasi Klasifikasi di Stasiun Unit Utama).
 
 ---
 
@@ -83,11 +122,8 @@ Panduan berikut menunjukkan cara mengatur lingkungan (*environment*) dan menjala
 Clone repositori dan instal seluruh pustaka pendukung yang dibutuhkan:
 
 ```bash
-# Clone repositori
 git clone [https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk.git](https://github.com/Juhenfw/EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk.git)
 cd EfficientDet-sistem-inspeksi-visual-otomatis-mvsdk
-
-# Instal dependensi
 pip install -r Training-EfficientDet/requirements.txt
 ```
 
@@ -125,10 +161,7 @@ Jika Anda menggunakan kode atau hasil penelitian dari repositori ini, harap beri
 ---
 
 ## Penulis
-**Juhen Fashikha Wildan**\
-Program Sarjana Teknik Robotika dan Kecerdasan Buatan\
-Fakultas Teknologi Maju dan Multidisiplin\
+**Juhen Fashikha Wildan**<br>
+Program Sarjana Teknik Robotika dan Kecerdasan Buatan<br>
+Fakultas Teknologi Maju dan Multidisiplin<br>
 **Universitas Airlangga**
-
----
-*Penelitian ini didukung oleh PT. XYZ sebagai bagian dari upaya peningkatan efisiensi proses pengepakan dan pengendalian mutu produk.*
