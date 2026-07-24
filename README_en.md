@@ -82,14 +82,14 @@ Because the system architecture is divided into two stages (Detection and Classi
 
 ### 1. Object Detection Stage Metrics
 This metric measures how precisely the AI model recognizes and localizes individual components. Based on an internal evaluation of 432 validation image samples:
-* **mAP@0.50**: 0.9932.
+* **mAP@0.50**: 0.9932
+* **F1-Score**: 0.9927
 
 ### 2. Completeness Classification Stage Metrics
 This metric measures the overall reliability of the system in making final decisions (Pass/Fail) after the object detection results are processed by the spatial logic algorithm.
-* **F1-Score**: 0.9927 (Based on 432 internal validation samples).
 * **Field Accuracy**: Based on an evaluation of 2,441 operational image samples obtained directly from the factory floor:
-  * **99.4%** (Classification Accuracy at Accessory Station).
-  * **97.8%** (Classification Accuracy at Main Unit Station).
+  * **99.4%** (Classification Accuracy at Accessory Station)
+  * **97.8%** (Classification Accuracy at Main Unit Station)
 
 ---
 

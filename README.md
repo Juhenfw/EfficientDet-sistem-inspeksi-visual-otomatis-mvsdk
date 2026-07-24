@@ -82,14 +82,14 @@ Karena arsitektur sistem ini terbagi menjadi dua tahap (*Detection* dan *Classif
 
 ### 1. Evaluasi Tahap Deteksi Objek (Object Detection Metrics)
 Metrik ini mengukur seberapa presisi model AI dalam mengenali dan melokalisasi komponen tunggal. Berdasarkan evaluasi internal terhadap 432 sampel citra validasi:
-* **mAP@0.50**: 0,9932.
+* **mAP@0.50**: 0,9932
+* **F1-Score**: 0,9927
 
 ### 2. Evaluasi Tahap Klasifikasi Kelengkapan (Completeness Classification Metrics)
 Metrik ini mengukur keandalan sistem secara keseluruhan dalam memberikan keputusan akhir (Pass/Fail) setelah hasil deteksi objek diproses oleh algoritma logika spasial.
-* **F1-Score**: 0,9927 (Berdasarkan 432 sampel validasi internal).
 * **Akurasi Lapangan (Field Accuracy)**: Berdasarkan evaluasi terhadap 2.441 sampel citra operasional yang didapatkan secara langsung di lapangan pabrik:
-  * **99,4%** (Akurasi Klasifikasi di Stasiun Aksesori).
-  * **97,8%** (Akurasi Klasifikasi di Stasiun Unit Utama).
+  * **99,4%** (Akurasi Klasifikasi di Stasiun Aksesori)
+  * **97,8%** (Akurasi Klasifikasi di Stasiun Unit Utama)
 
 ---
 
